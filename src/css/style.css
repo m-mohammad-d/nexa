@@ -659,6 +659,7 @@ body {
 .modal-card {
   width: 88%;
   max-width: 380px;
+  max-height: 94%;
   background: var(--bg-card);
   border: 1px solid var(--bg-card-border);
   border-radius: var(--border-radius-lg);
@@ -668,6 +669,7 @@ body {
   flex-direction: column;
   gap: 16px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .modal-title {
@@ -683,17 +685,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .modal-close-btn {
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   line-height: 1;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 4px 8px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: color var(--transition-fast);
+  touch-action: manipulation;
 }
 
 .modal-close-btn:hover {
@@ -800,55 +809,101 @@ body {
   color: var(--text-main);
 }
 
-/* Settings List */
+/* Settings List & Card Architecture */
+.settings-card {
+  max-height: 94%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .settings-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   text-align: left;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.35) rgba(255, 255, 255, 0.04);
+}
+
+.settings-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.settings-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+}
+
+.settings-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.35);
+  border-radius: 4px;
+}
+
+.settings-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.6);
 }
 
 .setting-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 46px;
+  box-sizing: border-box;
 }
 
 .setting-row-stack {
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 8px;
   border-bottom: none;
+  padding-bottom: 4px;
 }
 
 .setting-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding-right: 4px;
 }
 
 .setting-name {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .setting-desc {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
+  line-height: 1.25;
 }
 
 /* Toggle Switch */
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 44px;
-  height: 24px;
+  width: 46px;
+  height: 26px;
   flex-shrink: 0;
+  touch-action: manipulation;
+  cursor: pointer;
 }
 
 .toggle-switch input {
@@ -863,15 +918,15 @@ body {
   inset: 0;
   background-color: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 24px;
+  border-radius: 26px;
   transition: all var(--transition-fast);
 }
 
 .toggle-slider::before {
   position: absolute;
   content: "";
-  height: 16px;
-  width: 16px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
   background-color: #fff;
@@ -900,6 +955,7 @@ body {
   border-radius: var(--border-radius-sm);
   padding: 3px;
   gap: 3px;
+  box-sizing: border-box;
 }
 
 .segment-btn {
@@ -908,12 +964,14 @@ body {
   border: none;
   color: var(--text-dim);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  padding: 6px 0;
+  padding: 8px 0;
+  min-height: 38px;
   border-radius: 4px;
   cursor: pointer;
+  touch-action: manipulation;
   transition: all var(--transition-fast);
 }
 
@@ -926,9 +984,25 @@ body {
 
 .settings-footer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
-  margin-top: 8px;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.settings-footer > #btn-reset-stats {
+  flex: 1.1;
+  padding: 10px 8px;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.settings-footer > #btn-save-settings {
+  flex: 0.9;
+  padding: 10px 14px;
 }
 
 /* Controls Guide */
@@ -1122,7 +1196,7 @@ body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::aft
   transition-duration: 0.01ms !important;
 }
 
-/* ---------------- RESPONSIVE ADJUSTMENTS ---------------- */
+/* ---------------- RESPONSIVE ADJUSTMENTS & MOBILE SETTINGS ---------------- */
 
 @media (max-height: 700px) {
   .game-container {
@@ -1134,8 +1208,187 @@ body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::aft
   .hud-value {
     font-size: 1rem;
   }
-  .modal-card {
+}
+
+/* Mobile Screens & Short Viewports (Up to 768px wide or short screens) */
+@media (max-width: 768px), (max-height: 720px) {
+  #screen-settings,
+  #screen-controls {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    padding: 10px;
+    background: rgba(4, 6, 14, 0.94);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .settings-card,
+  .controls-card {
+    width: 100%;
+    max-width: 400px;
+    max-height: calc(100dvh - 20px);
+    max-height: calc(100vh - 20px);
     padding: 16px 14px;
     gap: 12px;
+    margin: auto;
+    overflow: hidden;
+  }
+
+  .settings-list {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+  }
+
+  .setting-row {
+    padding: 7px 0;
+    min-height: 46px;
+    gap: 8px;
+  }
+
+  .setting-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .setting-name {
+    font-size: 0.78rem;
+  }
+
+  .setting-desc {
+    font-size: 0.67rem;
+  }
+
+  .settings-footer {
+    padding-top: 6px;
+  }
+}
+
+/* Standard Mobile Devices (375px - 390px, e.g. iPhone SE / 12 / 13 / 14) */
+@media (max-width: 390px) {
+  .settings-card {
+    width: calc(100vw - 16px);
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+
+  .setting-row {
+    gap: 6px;
+    padding: 6px 0;
+    min-height: 44px;
+  }
+
+  .setting-name {
+    font-size: 0.76rem;
+  }
+
+  .setting-desc {
+    font-size: 0.64rem;
+  }
+
+  .toggle-switch {
+    width: 44px;
+    height: 24px;
+  }
+
+  .toggle-slider::before {
+    height: 16px;
+    width: 16px;
+  }
+
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+  }
+
+  .segment-btn {
+    font-size: 0.72rem;
+    padding: 7px 0;
+    min-height: 36px;
+  }
+
+  .settings-footer {
+    gap: 6px;
+  }
+
+  .settings-footer > #btn-reset-stats {
+    font-size: 0.68rem;
+    padding: 9px 6px;
+  }
+
+  .settings-footer > #btn-save-settings {
+    padding: 9px 12px;
+  }
+}
+
+/* Compact Mobile Devices (320px - 340px, e.g. iPhone SE 1st gen) */
+@media (max-width: 340px) {
+  .settings-card {
+    width: calc(100vw - 10px);
+    padding: 12px 8px;
+    gap: 8px;
+  }
+
+  .modal-title {
+    font-size: 1.15rem;
+  }
+
+  .setting-row {
+    padding: 5px 0;
+    min-height: 42px;
+  }
+
+  .setting-name {
+    font-size: 0.72rem;
+  }
+
+  .setting-desc {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+
+  .toggle-switch {
+    width: 40px;
+    height: 22px;
+  }
+
+  .toggle-slider::before {
+    height: 14px;
+    width: 14px;
+    bottom: 3px;
+    left: 3px;
+  }
+
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+  }
+
+  .segment-btn {
+    font-size: 0.66rem;
+    min-height: 34px;
+    padding: 5px 0;
+  }
+
+  .settings-footer {
+    flex-direction: column-reverse;
+    gap: 6px;
+  }
+
+  .settings-footer > .btn {
+    width: 100%;
+    padding: 8px 6px;
+    font-size: 0.72rem;
   }
 }

@@ -1144,6 +1144,13 @@ class InputManager {
     const minSwipeDistance = 18; // Minimal threshold for immediate responsive turns
 
     touchArea.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.modal-card') || e.target.closest('.menu-content')) {
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchStartTime = 0;
+        this.swipeTriggered = true;
+        return;
+      }
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         this.touchStartX = touch.clientX;
@@ -1154,6 +1161,11 @@ class InputManager {
     }, { passive: true });
 
     touchArea.addEventListener('touchmove', (e) => {
+      // Allow natural touch scrolling inside modal overlays (e.g. settings list)
+      if (e.target.closest('.modal-card') || e.target.closest('.menu-content')) {
+        return;
+      }
+
       // Prevent browser pull-to-refresh, zooming, and scrolling while playing
       e.preventDefault();
       if (e.touches.length === 0) return;
