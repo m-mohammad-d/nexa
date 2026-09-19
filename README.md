@@ -43,9 +43,10 @@
   - Square 24×24 grid rendered crisply across desktop, tablet, and mobile screens via `devicePixelRatio`.
   - Subtle background grid with drifting cyber dust motes and soft vignette framing.
 - **Full Mobile & Touch Support**:
-  - Fluid swipe gestures on the canvas.
-  - Semi-transparent virtual D-pad for mobile convenience.
-  - Automatic suppression of mobile pull-to-refresh and page scroll.
+  - Pure, ultra-responsive swipe steering across the entire game board.
+  - Zero on-screen clutter: completely free of virtual buttons or joysticks.
+  - Low-latency continuous gesture tracking supporting rapid zigzag turns.
+  - Full suppression of mobile browser pull-to-refresh and page scroll.
 - **Customizable Settings & Storage**:
   - Toggles for Sound FX, Ambient Music, Particles, Screen Shake, and Reduced Motion.
   - Difficulty modes: **Easy**, **Normal**, and **Hard**.
@@ -55,9 +56,9 @@
 
 ## 🕹 Controls
 
-| Action | Keyboard | Touch / Mobile |
+| Action | Keyboard | Mobile / Touch |
 | :--- | :--- | :--- |
-| **Move / Steer** | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> | Swipe anywhere on board / Tap D-Pad |
+| **Move / Steer** | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> | **Swipe anywhere on board** (Up, Down, Left, Right) |
 | **Pause / Resume** | <kbd>P</kbd> or <kbd>Esc</kbd> | Tap top-right Pause button |
 | **Start / Restart** | <kbd>Enter</kbd> or <kbd>Space</kbd> | Tap Menu / Game Over buttons |
 
@@ -146,7 +147,7 @@ git push -u origin main
 | `ObstacleManager` | Procedural level-based obstacle generation and collision verification |
 | `ParticleSystem` | Pooled particle emitter for sparkles, shockwaves, and impact debris |
 | `AudioManager` | Web Audio API synthesizer for SFX and procedural ambient soundtrack |
-| `InputManager` | Multi-platform input capturing (Keyboard, Touch Swipes, Virtual D-pad) |
+| `InputManager` | Multi-platform input capturing (Keyboard WASD/Arrows, Responsive Touch Swipes) |
 | `UIManager` | HUD metrics, floating score popups, screen shake/flash triggers, screen transitions |
 | `StorageManager` | Safe `localStorage` handler with quota error fallbacks |
 

@@ -1139,51 +1139,63 @@ class InputManager {
       }
     });
 
-    // Touch Swipe inputs on canvas
-    const canvas = document.getElementById('game-canvas');
+    // Touch Swipe inputs on entire game board
+    const touchArea = document.getElementById('viewport') || document.getElementById('game-canvas');
+    const minSwipeDistance = 18; // Minimal threshold for immediate responsive turns
 
-    canvas.addEventListener('touchstart', (e) => {
+    touchArea.addEventListener('touchstart', (e) => {
       if (e.touches.length > 0) {
-        this.touchStartX = e.touches[0].clientX;
-        this.touchStartY = e.touches[0].clientY;
+        const touch = e.touches[0];
+        this.touchStartX = touch.clientX;
+        this.touchStartY = touch.clientY;
         this.touchStartTime = performance.now();
+        this.swipeTriggered = false;
       }
     }, { passive: true });
 
-    canvas.addEventListener('touchmove', (e) => {
-      // Prevent screen pulling/scrolling during game swipe
+    touchArea.addEventListener('touchmove', (e) => {
+      // Prevent browser pull-to-refresh, zooming, and scrolling while playing
       e.preventDefault();
+      if (e.touches.length === 0) return;
+
+      const touch = e.touches[0];
+      const dx = touch.clientX - this.touchStartX;
+      const dy = touch.clientY - this.touchStartY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      if (absDx >= minSwipeDistance || absDy >= minSwipeDistance) {
+        if (absDx > absDy) {
+          this.onDirectionChange(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
+        } else {
+          this.onDirectionChange(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+        }
+        // Reset origin to current touch point for fluid continuous multi-turn gestures
+        this.touchStartX = touch.clientX;
+        this.touchStartY = touch.clientY;
+        this.swipeTriggered = true;
+      }
     }, { passive: false });
 
-    canvas.addEventListener('touchend', (e) => {
-      if (e.changedTouches.length === 0) return;
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-      const dx = endX - this.touchStartX;
-      const dy = endY - this.touchStartY;
+    touchArea.addEventListener('touchend', (e) => {
+      if (this.swipeTriggered || e.changedTouches.length === 0) return;
+
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - this.touchStartX;
+      const dy = touch.clientY - this.touchStartY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
       const elapsed = performance.now() - this.touchStartTime;
 
-      const minSwipeDistance = 22;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > minSwipeDistance && elapsed < 450) {
-        if (Math.abs(dx) > Math.abs(dy)) {
+      // Handle rapid short flick gestures
+      if (Math.max(absDx, absDy) >= 12 && elapsed < 350) {
+        if (absDx > absDy) {
           this.onDirectionChange(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
         } else {
           this.onDirectionChange(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
         }
       }
     }, { passive: true });
-
-    // Mobile Virtual D-Pad
-    document.querySelectorAll('.dpad-btn').forEach(btn => {
-      btn.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        const dir = btn.dataset.dir;
-        if (dir === 'UP') this.onDirectionChange({ x: 0, y: -1 });
-        if (dir === 'DOWN') this.onDirectionChange({ x: 0, y: 1 });
-        if (dir === 'LEFT') this.onDirectionChange({ x: -1, y: 0 });
-        if (dir === 'RIGHT') this.onDirectionChange({ x: 1, y: 0 });
-      });
-    });
   }
 }
 
