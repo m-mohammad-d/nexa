@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070913">
+  <meta name="description" content="NEXA - Modern arcade Snake game reimagining the classic Nokia Snake II.">
+  <title>NEXA : CLASSIC EVOLVED</title>
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+  <div id="game-app" class="game-container">
+    <header class="hud-layer" id="hud" aria-label="Game HUD">
+      <div class="hud-group hud-left">
+        <div class="hud-card">
+          <span class="hud-label">SCORE</span>
+          <span class="hud-value" id="hud-score">0</span>
+        </div>
+        <div class="hud-card hud-combo-card" id="hud-combo-card">
+          <div class="hud-combo-header">
+            <span class="hud-label">COMBO</span>
+            <span class="hud-combo-multiplier" id="hud-combo-text">x1</span>
+          </div>
+          <div class="hud-meter">
+            <div class="hud-meter-fill" id="hud-combo-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-group hud-center">
+        <div class="hud-level-badge" id="hud-level-badge">
+          <span class="hud-level-prefix">LVL</span>
+          <span class="hud-level-num" id="hud-level">01</span>
+        </div>
+      </div>
+
+      <div class="hud-group hud-right">
+        <div class="hud-card">
+          <span class="hud-label">BEST</span>
+          <span class="hud-value" id="hud-high-score">0</span>
+        </div>
+        <button id="btn-pause-toggle" class="hud-icon-btn" aria-label="Pause Game" title="Pause (P / ESC)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="hud-status-strip" id="hud-status-strip">
+      <div class="active-powerups-list" id="active-powerups-list"></div>
+      <div class="active-bonus-indicator" id="active-bonus-indicator">
+        <div class="bonus-pulse-dot"></div>
+        <span class="bonus-label">TIMED BONUS</span>
+        <span class="bonus-timer-text" id="bonus-timer-text">--</span>
+      </div>
+    </div>
+
+    <main class="canvas-viewport" id="viewport">
+      <canvas id="game-canvas"></canvas>
+
+      <div class="event-banner" id="event-banner" aria-live="polite">
+        <div class="event-banner-tag">SPECIAL EVENT</div>
+        <div class="event-banner-title" id="event-banner-title">FOOD FRENZY</div>
+      </div>
+
+      <div class="level-up-banner" id="level-up-banner">
+        <span class="level-up-title">LEVEL UP</span>
+        <span class="level-up-num" id="level-up-num">LEVEL 02</span>
+      </div>
+
+      <div class="floating-text-layer" id="floating-text-layer"></div>
+
+      <!-- Menu Overlay -->
+      <div class="screen-overlay active" id="screen-menu">
+        <div class="menu-content">
+          <div class="brand-block">
+            <h1 class="brand-title">NEXA</h1>
+            <p class="brand-subtitle">CLASSIC EVOLVED</p>
+          </div>
+
+          <div class="menu-high-score-card">
+            <span class="card-label">ALL-TIME HIGH SCORE</span>
+            <span class="card-value neon-gold" id="menu-high-score">0</span>
+          </div>
+
+          <div class="menu-nav-actions">
+            <button id="btn-play" class="btn btn-primary btn-large">
+              <span class="btn-glow"></span>
+              <span class="btn-text">PLAY</span>
+            </button>
+            <div class="btn-grid-row">
+              <button id="btn-settings" class="btn btn-secondary">
+                <span class="btn-text">SETTINGS</span>
+              </button>
+              <button id="btn-controls" class="btn btn-secondary">
+                <span class="btn-text">CONTROLS</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="menu-footer-stats">
+            <div class="stat-pill">
+              <span class="stat-pill-label">GAMES</span>
+              <span class="stat-pill-val" id="menu-total-games">0</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">MAX LVL</span>
+              <span class="stat-pill-val" id="menu-highest-level">1</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">MAX COMBO</span>
+              <span class="stat-pill-val" id="menu-best-combo">x1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Countdown Overlay -->
+      <div class="screen-overlay" id="screen-countdown">
+        <div class="countdown-display">
+          <span class="countdown-digit" id="countdown-digit">3</span>
+        </div>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div class="screen-overlay" id="screen-pause">
+        <div class="modal-card">
+          <h2 class="modal-title">PAUSED</h2>
+          <div class="modal-actions">
+            <button id="btn-resume" class="btn btn-primary">
+              <span class="btn-text">RESUME</span>
+            </button>
+            <button id="btn-restart-pause" class="btn btn-secondary">
+              <span class="btn-text">RESTART</span>
+            </button>
+            <button id="btn-menu-pause" class="btn btn-ghost">
+              <span class="btn-text">MAIN MENU</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div class="screen-overlay" id="screen-gameover">
+        <div class="modal-card gameover-card">
+          <div class="gameover-header">
+            <h2 class="modal-title gameover-title">GAME OVER</h2>
+            <div class="new-high-badge" id="gameover-new-high">NEW HIGH SCORE!</div>
+          </div>
+
+          <div class="gameover-score-hero">
+            <span class="hero-label">FINAL SCORE</span>
+            <span class="hero-value" id="gameover-final-score">0</span>
+          </div>
+
+          <div class="gameover-stats-grid">
+            <div class="go-stat-item">
+              <span class="go-stat-label">LEVEL</span>
+              <span class="go-stat-val" id="gameover-level">01</span>
+            </div>
+            <div class="go-stat-item">
+              <span class="go-stat-label">LENGTH</span>
+              <span class="go-stat-val" id="gameover-length">4</span>
+            </div>
+            <div class="go-stat-item">
+              <span class="go-stat-label">BEST COMBO</span>
+              <span class="go-stat-val" id="gameover-combo">x1</span>
+            </div>
+            <div class="go-stat-item">
+              <span class="go-stat-label">TIME</span>
+              <span class="go-stat-val" id="gameover-time">00:00</span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button id="btn-play-again" class="btn btn-primary btn-large">
+              <span class="btn-glow"></span>
+              <span class="btn-text">PLAY AGAIN</span>
+            </button>
+            <button id="btn-menu-gameover" class="btn btn-secondary">
+              <span class="btn-text">MAIN MENU</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Modal -->
+      <div class="screen-overlay" id="screen-settings">
+        <div class="modal-card settings-card">
+          <div class="modal-header-row">
+            <h2 class="modal-title">SETTINGS</h2>
+            <button id="btn-close-settings" class="modal-close-btn" aria-label="Close Settings">&times;</button>
+          </div>
+
+          <div class="settings-list">
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-name">SOUND FX</span>
+                <span class="setting-desc">Procedural arcade sound effects</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-sound" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-name">AMBIENT MUSIC</span>
+                <span class="setting-desc">Procedural synth soundscape</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-music" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-name">PARTICLES</span>
+                <span class="setting-desc">Spark bursts and collection FX</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-particles" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-name">SCREEN SHAKE</span>
+                <span class="setting-desc">Dynamic impact rumble</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-shake" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-name">REDUCED MOTION</span>
+                <span class="setting-desc">Minimize screen transitions</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-reduced-motion">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row setting-row-stack">
+              <span class="setting-name">DIFFICULTY</span>
+              <div class="segmented-control" id="difficulty-control">
+                <button type="button" class="segment-btn" data-diff="easy">EASY</button>
+                <button type="button" class="segment-btn active" data-diff="normal">NORMAL</button>
+                <button type="button" class="segment-btn" data-diff="hard">HARD</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-footer">
+            <button id="btn-reset-stats" class="btn btn-danger-outline">
+              <span class="btn-text">RESET ALL STATS</span>
+            </button>
+            <button id="btn-save-settings" class="btn btn-primary">
+              <span class="btn-text">DONE</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Modal -->
+      <div class="screen-overlay" id="screen-controls">
+        <div class="modal-card controls-card">
+          <div class="modal-header-row">
+            <h2 class="modal-title">HOW TO PLAY</h2>
+            <button id="btn-close-controls" class="modal-close-btn" aria-label="Close Controls">&times;</button>
+          </div>
+
+          <div class="controls-content-grid">
+            <div class="control-guide-card">
+              <span class="guide-badge">KEYBOARD</span>
+              <p class="guide-detail"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> to steer</p>
+              <p class="guide-detail"><kbd>P</kbd> or <kbd>ESC</kbd> to Pause</p>
+              <p class="guide-detail"><kbd>ENTER</kbd> or <kbd>SPACE</kbd> to Start / Restart</p>
+            </div>
+
+            <div class="control-guide-card">
+              <span class="guide-badge">TOUCH / MOBILE</span>
+              <p class="guide-detail">Swipe anywhere on the board to steer</p>
+              <p class="guide-detail">Tap top-right icon to pause</p>
+              <p class="guide-detail">Quick on-screen virtual d-pad enabled</p>
+            </div>
+
+            <div class="control-guide-card full-width">
+              <span class="guide-badge">ITEMS & BONUSES</span>
+              <div class="legend-grid">
+                <div class="legend-item"><span class="legend-dot cyan"></span> Normal (+10, Growth)</div>
+                <div class="legend-item"><span class="legend-dot gold"></span> Golden (+50, Bonus growth)</div>
+                <div class="legend-item"><span class="legend-dot purple"></span> Timed Bonus (+250 to +1000 fast!)</div>
+                <div class="legend-item"><span class="legend-dot green"></span> Power-Ups (Speed, Magnet, Ghost...)</div>
+              </div>
+            </div>
+          </div>
+
+          <button id="btn-controls-done" class="btn btn-primary">
+            <span class="btn-text">GOT IT</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile On-Screen D-Pad (Touch Devices) -->
+      <div class="mobile-dpad-container" id="mobile-dpad">
+        <div class="dpad-cross">
+          <button class="dpad-btn dpad-up" data-dir="UP" aria-label="Up">▲</button>
+          <div class="dpad-middle-row">
+            <button class="dpad-btn dpad-left" data-dir="LEFT" aria-label="Left">◀</button>
+            <div class="dpad-center"></div>
+            <button class="dpad-btn dpad-right" data-dir="RIGHT" aria-label="Right">▶</button>
+          </div>
+          <button class="dpad-btn dpad-down" data-dir="DOWN" aria-label="Down">▼</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <span class="footer-tip">PRO TIP: Rapid consecutive turns are queued safely!</span>
+    </footer>
+  </div>
+
+  <script src="src/js/script.js"></script>
+</body>
+</html>
